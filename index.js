@@ -1,16 +1,12 @@
 var geolib = require('geolib'),
 	   csv = require('fast-csv'),
-	    fs = require('fs');
+	    fs = require('fs'),
+	  args = process.argv,
+	assets = [],
+ startTime = Date.now();
 
-var assets = [];
-
-// **** THIS IS HARD CODED!!
-var fileName = "./test/small_data.csv";
-var asset1 = new Asset("RF Box 1", 33.529053, -112.296791);
-// Each asset created will add a new column to the final CSV
-// var asset2 = new Asset("RF Box 2", 33.529003, -112.296783);
-// var asset3 = new Asset("RF Box 3", 33.666313, -112.221207);
-// **** THIS IS HARD CODED!!
+var fileName = args[2];
+buildAssets(args[3]);
 
 var readStream = fs.createReadStream(fileName);
 var newFileName = formatNewFileName(fileName);
@@ -25,6 +21,17 @@ function Asset(name, latitude, longitude) {
 	assets.push(this);
 }
 
+function buildAssets(file) {
+	var assetStream = fs.createReadStream(file);
+	csv
+		.fromStream(assetStream)
+		.on("data", function(row){
+			new Asset(row[0], row[1], row[2]);
+		})
+		.on("end", function() {
+			console.log('\n');
+		});
+}
 // Helper Functions
 function distanceBetweenPoints(lat1, long1, lat2, long2) {
 	// args for .getDistance(point1, point2, accuracy, precision= # of decimal places)
@@ -79,6 +86,12 @@ function buildResultCSV() {
 		.pipe(writeStream);
 }
 
+function exitMessage() {
+	var endTime = Date.now();
+	var runTime = (endTime - startTime)/1000
+	console.log(`Processing completed in ${runTime}s.\nThe new file is: ${newFileName}`);
+}
+
 // Program Main - procedural which could probably be wrapped into something better
 csv
 	.fromStream(readStream, { headers: true})
@@ -87,5 +100,5 @@ csv
 	})
 	.on("end", function() {
 		buildResultCSV();
-		console.log(`Processing complete.\nThe new file is: ${newFileName}`);
+		exitMessage();
 	});
