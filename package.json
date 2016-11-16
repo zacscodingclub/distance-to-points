@@ -1,0 +1,15 @@
+{
+  "name": "rf_distance",
+  "version": "1.0.0",
+  "description": "Calculate distance to asset, output as CSV",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+  		"geolib": "~2.0.22",
+  		"fast-csv": "~2.3.0"
+  	},
+  "author": "Zac Baston",
+  "license": "ISC"
+}
